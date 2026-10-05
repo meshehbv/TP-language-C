@@ -7,12 +7,14 @@
 PN532_I2C pn532_i2c(Wire);
 NfcAdapter nfc = NfcAdapter(pn532_i2c);
 
-// Tableau de badges préenregistrés caché dans nfc.cpp
-static const struct Tag known_tags[] = {
-    {{0xC7, 0x4D, 0x4F, 0x03}}, 
-    {{0x1A, 0x3A, 0x1C, 0x18}}
-};
-static const int num_known_tags = sizeof(known_tags) / sizeof(known_tags[0]);
+#define MAX_KNOWN_TAGS 20
+#define MAX_ADMIN_TAGS 5
+
+struct Tag known_tags[MAX_KNOWN_TAGS];
+struct Tag admin_tag[MAX_ADMIN_TAGS];
+
+static int num_known_tags = 0;
+static int num_admin_tags = 0;
 
 
 bool nfc_init() {
@@ -41,6 +43,43 @@ bool is_tag_known(struct Tag tag_to_check) {
         if (tag_are_equals(tag_to_check, known_tags[i])) {
             return true;
         }
+    }
+    return false;
+}
+
+bool is_tag_admin(struct Tag tag_to_check) {
+    for (int i = 0; i < num_admin_tags; i++) {
+        if (tag_are_equals(tag_to_check, admin_tag[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool register_user_tag(struct Tag new_tag) {
+    if (num_known_tags >= MAX_KNOWN_TAGS) return false; // Array full
+    if (is_tag_known(new_tag)) return false;            // Already registered
+    
+    known_tags[num_known_tags] = new_tag;
+    num_known_tags++;
+    return true;
+}
+
+// Registers a struct Tag as an admin
+bool register_admin_tag(struct Tag new_tag) {
+    if (num_admin_tags >= MAX_ADMIN_TAGS) return false; // Array full
+    if (is_tag_admin(new_tag)) return false;            // Already admin
+    
+    admin_tag[num_admin_tags++] = new_tag;
+    known_tags[num_known_tags++] = new_tag; // Also register as known
+    return true;
+}
+
+// Reads a tag currently on the scanner and registers it as a user
+bool register_presented_tag() {
+    if (tag_present()) {
+        struct Tag new_tag = tag_read();
+        return register_user_tag(new_tag);
     }
     return false;
 }

@@ -8,4 +8,4 @@ void lcd_init();
 /*
 Affiche le texte donné en paramètre sur la ligne indiqué.
 */
-void lcd_print(unsigned char row, const char * text)
+void lcd_print(unsigned char row, const char * text);

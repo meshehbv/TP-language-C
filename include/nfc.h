@@ -29,3 +29,11 @@ struct Tag tag_read();
 bool tag_are_equals(struct Tag tag1, struct Tag tag2);
 
 bool is_tag_known(struct Tag tag_to_check);
+
+bool register_admin_tag(struct Tag new_tag);
+
+bool register_presented_tag();
+
+bool register_user_tag(struct Tag new_tag);
+
+bool is_tag_admin(struct Tag tag_to_check);
