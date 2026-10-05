@@ -37,3 +37,5 @@ bool register_presented_tag();
 bool register_user_tag(struct Tag new_tag);
 
 bool is_tag_admin(struct Tag tag_to_check);
+
+bool replace_admin_tag(struct Tag new_admin);

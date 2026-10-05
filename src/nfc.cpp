@@ -83,3 +83,24 @@ bool register_presented_tag() {
     }
     return false;
 }
+
+bool replace_admin_tag(struct Tag new_admin) {
+    // "Delete" the previous admin by resetting the counter to 0
+    num_admin_tags = 0;
+    
+    // Add the new tag as the single active admin
+    admin_tag[0] = new_admin;
+    num_admin_tags = 1;
+
+    // If the tag is already a user, it simply gains admin rights.
+    // If it is NOT a user yet, add it to the known_tags array so it can trigger "Ouverture".
+    if (!is_tag_known(new_admin)) {
+        if (num_known_tags < MAX_KNOWN_TAGS) {
+            known_tags[num_known_tags] = new_admin;
+            num_known_tags++;
+        } else {
+            return false; // User array is full
+        }
+    }
+    return true;
+}
